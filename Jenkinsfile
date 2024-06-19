@@ -30,58 +30,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Set Up Python Environment') {
-            steps {
-                dir('server') {
-                    sh "python3 -m venv ${VENV}"
-                    sh ". ${VENV}/bin/activate && pip install -r requirements.txt"
-                }
-            }
-        }
-
-        stage('Run Backend Tests') {
-            steps {
-                dir('server') {
-                    sh ". ${VENV}/bin/activate && pytest"
-                }
-            }
-        }
-
-        stage('Run Django Migrations') {
-            steps {
-                dir('server') {
-                    sh ". ${VENV}/bin/activate && python manage.py migrate"
-                }
-            }
-        }
-
-        stage('Collect Static Files') {
-            steps {
-                dir('server') {
-                    sh ". ${VENV}/bin/activate && python manage.py collectstatic --noinput"
-                }
-            }
-        }
-
-        stage('Run Django Server') {
-            steps {
-                dir('server') {
-                    sh ". ${VENV}/bin/activate && python manage.py runserver"
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
     }
 }
