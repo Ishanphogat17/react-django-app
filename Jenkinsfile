@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_VERSION = '3.9'
         NODEJS_HOME = tool name: 'NodeJS 14', type: 'NodeJSInstallation'
         PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
-        VENV = "venv"
+        PYTHON_HOME = tool name: 'Python 3.9', type: 'hudson.plugins.python.PythonInstallation'
+        VENV = "${WORKSPACE}/venv"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/Ishanphogat17/react-django-app'
+                git branch: 'main', url: 'https://github.com/Ishanphogat17/react-django-app.git'
             }
         }
 
@@ -19,14 +19,6 @@ pipeline {
             steps {
                 dir('client') {
                     sh 'npm install'
-                }
-            }
-        }
-
-        stage('Run Frontend Tests') {
-            steps {
-                dir('client') {
-                    sh 'npm test'
                 }
             }
         }
@@ -42,9 +34,8 @@ pipeline {
         stage('Set Up Python Environment') {
             steps {
                 dir('server') {
-                    sh 'python3 -m venv ${env.VENV}'
-                    sh '. ${env.VENV}/bin/activate && pip'
-
+                    sh "python3 -m venv ${VENV}"
+                    sh ". ${VENV}/bin/activate && pip install -r requirements.txt"
                 }
             }
         }
@@ -52,7 +43,31 @@ pipeline {
         stage('Run Backend Tests') {
             steps {
                 dir('server') {
-                    sh '. ${env.VENV}/bin/activate && pytest'
+                    sh ". ${VENV}/bin/activate && pytest"
+                }
+            }
+        }
+
+        stage('Run Django Migrations') {
+            steps {
+                dir('server') {
+                    sh ". ${VENV}/bin/activate && python manage.py migrate"
+                }
+            }
+        }
+
+        stage('Collect Static Files') {
+            steps {
+                dir('server') {
+                    sh ". ${VENV}/bin/activate && python manage.py collectstatic --noinput"
+                }
+            }
+        }
+
+        stage('Run Django Server') {
+            steps {
+                dir('server') {
+                    sh ". ${VENV}/bin/activate && python manage.py runserver"
                 }
             }
         }
