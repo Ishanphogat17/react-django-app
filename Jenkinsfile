@@ -42,7 +42,8 @@ pipeline {
             steps {
                 dir('server') {
                     sh 'python3 -m venv ${env.VENV}'
-                    sh '. ${env.VENV}/bin/activate && pip
+                    sh '. ${env.VENV}/bin/activate && pip'
+
                 }
             }
         }
