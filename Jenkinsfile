@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PYTHON_VERSION = '3.9'
         NODEJS_HOME = tool name: 'NodeJS 14', type: 'NodeJSInstallation'
         PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
         VENV = "venv"
