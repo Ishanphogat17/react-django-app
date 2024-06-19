@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: https://github.com/Ishanphogat17/react-django-app
+                git branch: 'master', url: 'https://github.com/Ishanphogat17/react-django-app'
             }
         }
 
